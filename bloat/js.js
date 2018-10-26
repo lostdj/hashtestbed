@@ -18,7 +18,7 @@ document.querySelector('head').innerHTML +=
 <!--<script type="text/javascript" src="bloat/markdeep.js"></script>-->
 
 <!---->
-<!--<link rel="stylesheet" type="text/css" href="bloat/.css"/>-->
+<!--<link rel="stylesheet" type="text/css" href="bloat/css.css"/>-->
 
 <!--<style type="text/css">
 	body
@@ -73,7 +73,7 @@ document.querySelector('head').innerHTML +=
 document.write(
 `
 <!---->
-<link rel="stylesheet" type="text/css" href="bloat/.css"/>
+<link rel="stylesheet" type="text/css" href="bloat/css.css"/>
 
 <!---->
 <!--
@@ -156,7 +156,7 @@ document.write(
 // 	document.write(
 // 	`
 // 	<!---->
-// 	<link rel="stylesheet" type="text/css" href="bloat/.css"/>
+// 	<link rel="stylesheet" type="text/css" href="bloat/css.css"/>
 
 // 	<!---->
 // 	<link rel="stylesheet" type="text/css" href="bloat/js-emoji/emoji.css"/>
