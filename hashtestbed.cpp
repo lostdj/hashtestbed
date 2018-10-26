@@ -1749,7 +1749,7 @@ https://github.com/lostdj/hashtestbed
 git clone --recursive https://github.com/lostdj/hashtestbed
 cd hashtestbed
 clang++ -Wall -Wextra -O2 -mavx -maes -std=c++2a -o hashtestbed hashtestbed.cpp \
-  && time ./hashtestbed 2>/dev/null >index.md.htm
+  && time ./hashtestbed 2>/dev/null >index.htm
 ```
 
 )"
@@ -2406,7 +2406,7 @@ main(int, char**)
 			tbs.test("0..N-", 1000000, 466000, f);
 		}
 
-		sout("\n\n<script src=\"bloat/.js\"></script>\n");
+		sout("\n\n<script src=\"bloat/js.js\"></script>\n");
 	}
 
 	return 0;
