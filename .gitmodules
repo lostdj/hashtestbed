@@ -1,0 +1,9 @@
+[submodule "t1ha"]
+	path = t1ha
+	url = https://github.com/leo-yuriev/t1ha
+[submodule "xxHash"]
+	path = xxHash
+	url = https://github.com/Cyan4973/xxHash
+[submodule "meow0.1a"]
+	path = meow_hash-0.1a
+	url = https://github.com/cmuratori/meow_hash
