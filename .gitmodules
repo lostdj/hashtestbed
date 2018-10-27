@@ -7,3 +7,6 @@
 [submodule "meow0.1a"]
 	path = meow_hash-0.1a
 	url = https://github.com/cmuratori/meow_hash
+[submodule "meow0.2"]
+	path = meow_hash-0.2
+	url = https://github.com/cmuratori/meow_hash

@@ -34,10 +34,21 @@
 
 //
 namespace
-meow
+meow01
 {
 
 #include "meow_hash-0.1a/meow_hash.h"
+
+} // namespace meow
+
+//
+namespace
+meow02
+{
+
+#undef MEOW_HASH_TYPES
+
+#include "meow_hash-0.2/meow_hash.h"
 
 } // namespace meow
 
@@ -425,6 +436,7 @@ static void MurmurHash3_x86_32 ( const void * key, int len,
 namespace
 xxhash
 {
+
 #define XXH_STATIC_LINKING_ONLY
 //#define XXH_INLINE_ALL
 
@@ -1031,6 +1043,18 @@ Pcg
 		u8 r2 = n2;
 
 		return (r1 << 32) | r2;
+	}
+
+	cexpr inline
+	auto
+	next16()
+	{
+		struct
+		{
+			u8 d[2];
+		} ret{{next8(), next8()}};
+
+		return ret;
 	}
 
 	// Generate a uniformly distributed number, r, where 0 <= r < bound.
@@ -1679,11 +1703,14 @@ R"(
 		test(name, "pcg84b2", tbs, f, [&](Res& r){return (u4)pcg::pcg4b2(r.data, r.length, table_size);});
 		test(name, "pcg84z1", tbs, f, [&](Res& r){return (u4)pcg::pcg4z1(r.data, r.length);});
 		test(name, "pcg84z2", tbs, f, [&](Res& r){return (u4)pcg::pcg4z2(r.data, r.length);});
-		test(name, "meow0.1a-18", tbs, f, [](Res& r){return (u8)(meow::MeowHash1(0, r.length, r.data).Sub[0]);});
-		testx(name, "^ X", tbs, f, [](Res& r){return (u8)(meow::MeowHash1(0, r.length, r.data).Sub[0]);});
-		test(name, "meow0.1a-184hi", tbs, f, [](Res& r){return (u4)(meow::MeowHash1(0, r.length, r.data).Sub[0] >> 32);});
-		test(name, "meow0.1a-184lo", tbs, f, [](Res& r){return (u4)(meow::MeowHash1(0, r.length, r.data).Sub[0]);});
-		testx(name, "^ X", tbs, f, [](Res& r){return (u4)(meow::MeowHash1(0, r.length, r.data).Sub[0]);});
+		test(name, "meow0.2-184lo", tbs, f, [](Res& r){return (u4)(meow02::MeowHash1(0, r.length, r.data).u64[0]);});
+		test(name, "meow0.1-184lo", tbs, f, [](Res& r){return (u4)(meow01::MeowHash1(0, r.length, r.data).Sub[0]);});
+		testx(name, "^meow0.2-184lo", tbs, f, [](Res& r){return (u4)(meow02::MeowHash1(0, r.length, r.data).u64[0]);});
+		testx(name, "^meow0.1-184lo", tbs, f, [](Res& r){return (u4)(meow01::MeowHash1(0, r.length, r.data).Sub[0]);});
+		testx(name, "^meow0.2-18", tbs, f, [](Res& r){return (u8)(meow02::MeowHash1(0, r.length, r.data).u64[0]);});
+		testx(name, "^meow0.1-18", tbs, f, [](Res& r){return (u8)(meow01::MeowHash1(0, r.length, r.data).Sub[0]);});
+//		test(name, "meow0.2-184hi", tbs, f, [](Res& r){return (u4)(meow02::MeowHash1(0, r.length, r.data).u64[0] >> 32);});
+//		test(name, "meow0.1-184hi", tbs, f, [](Res& r){return (u4)(meow01::MeowHash1(0, r.length, r.data).Sub[0] >> 32);});
 //		test(name, "meow24", tbs, f, [](Res& r){return (u4)(meow::MeowHash2(0, r.length, r.data).Sub[0]);});
 //		test(name, "meow28", tbs, f, [](Res& r){return (u8)(meow::MeowHash2(0, r.length, r.data).Sub[0]);});
 //		test(name, "meow44", tbs, f, [](Res& r){return (u4)(meow::MeowHash4(0, r.length, r.data).Sub[0]);});
@@ -1941,7 +1968,7 @@ main(int, char**)
 
 		//if(0)
 		{
-			sout("### Hash(rnd)\n");
+			sout("### Hash(rnd4)\n");
 
 			cexpr const auto randreset = true;
 
@@ -1956,6 +1983,71 @@ main(int, char**)
 				*d = pcg.next4();
 
 				return HashTestbed::Res{.data = (byte*)d, 4};
+			};
+			tbs.test("0..N-", 8, 3, f);
+			tbs.test("0..N-", 8, 7, f);
+			tbs.test("0..N", 8, 8, f);
+			tbs.test("0..N+", 8, 9, f);
+			tbs.test("0..N+", 8, 16, f);
+			tbs.test("0..N+", 128, 128, f);
+			tbs.test("0..N+", 128, 256, f);
+			tbs.test("0..N+", 128, 512, f);
+			tbs.test("0..N+", 128, 1024, f);
+			tbs.test("0..N-", 256, 100, f);
+			tbs.test("0..N+", 256, 300, f);
+			tbs.test("0..N+", 256, 5000, f);
+			tbs.test("0..N+", 256, 1005000, f);
+		}
+
+		//if(0)
+		{
+			sout("### Hash(rnd8)\n");
+
+			cexpr const auto randreset = true;
+
+			static pcg::Pcg pcg(0ul);
+
+			auto f = [&](HashTestbed& tbs)
+			{
+				if(randreset && tbs.iter == 0)
+					pcg = pcg::Pcg(0ul);
+
+				u8* d = (u8*)tbs.buf;
+				*d = pcg.next8();
+
+				return HashTestbed::Res{.data = (byte*)d, 8};
+			};
+			tbs.test("0..N-", 8, 3, f);
+			tbs.test("0..N-", 8, 7, f);
+			tbs.test("0..N", 8, 8, f);
+			tbs.test("0..N+", 8, 9, f);
+			tbs.test("0..N+", 8, 16, f);
+			tbs.test("0..N+", 128, 128, f);
+			tbs.test("0..N+", 128, 256, f);
+			tbs.test("0..N+", 128, 512, f);
+			tbs.test("0..N+", 128, 1024, f);
+			tbs.test("0..N-", 256, 100, f);
+			tbs.test("0..N+", 256, 300, f);
+			tbs.test("0..N+", 256, 5000, f);
+			tbs.test("0..N+", 256, 1005000, f);
+		}
+
+		//if(0)
+		{
+			sout("### Hash(rnd16)\n");
+
+			cexpr const auto randreset = true;
+
+			static pcg::Pcg pcg(0ul);
+
+			auto f = [&](HashTestbed& tbs)
+			{
+				if(randreset && tbs.iter == 0)
+					pcg = pcg::Pcg(0ul);
+
+				*((decltype(pcg.next16())*)tbs.buf) = pcg.next16();
+
+				return HashTestbed::Res{.data = tbs.buf, 16};
 			};
 			tbs.test("0..N-", 8, 3, f);
 			tbs.test("0..N-", 8, 7, f);
